@@ -1,0 +1,31 @@
+{
+  "name": "xyquest",
+  "version": "1.0.0",
+  "description": "A proxy based HTTP requests utility",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oakfang/xyquest.git"
+  },
+  "keywords": [
+    "proxy",
+    "request",
+    "http"
+  ],
+  "author": "Alon Niv",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oakfang/xyquest/issues"
+  },
+  "homepage": "https://github.com/oakfang/xyquest#readme",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "dependencies": {
+    "request": "^2.81.0",
+    "standard-http-error": "^2.0.0"
+  }
+}
