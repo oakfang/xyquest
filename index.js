@@ -1,15 +1,3 @@
-const request = require('request');
-const HttpError = require('standard-http-error');
-
-function promisifyRequest(options) {
-    return new Promise((resolve, reject) =>
-        request(options, (err, resp, body) => {
-            if (err) return reject(err);
-            if (resp.statusCode >= 400) return reject(new HttpError(resp.statusCode));
-            return resolve(body);
-        }));
-}
-
 const methods = new Set([
     'get',
     'post',
@@ -18,32 +6,42 @@ const methods = new Set([
     'delete',
 ]);
 
-function getProxy(stack, baseOptions) {
+function hyphenate(string) {
+    return string.replace(/([A-Z])/g, '-$1').toLowerCase();
+}
+
+function getProxy(stack, adapter, baseOptions) {
     return new Proxy({}, {
         get(_, prop) {
             if (methods.has(prop.toLowerCase())) {
-                const uri = stack.join('/');
                 const method = prop;
                 return (body, override={}) => {
                     const options = Object.assign(
                         {},
                         baseOptions,
-                        { body, method, uri },
+                        { body, method },
                         override
                     );
-                    return promisifyRequest(options);
+                    if (options.hyphenate) {
+                        stack = stack.map(hyphenate);
+                    }
+                    options.uri = stack.join('/');
+                    return adapter(options);
                 };
             }
-            return getProxy(stack.concat([prop]), baseOptions);
+            return getProxy(stack.concat([prop]), adapter, baseOptions);
         }
     });
 }
 
-function xyquest(baseUrl, baseOptions={}) {
+function xyquest(adapter, baseUrl, baseOptions={}) {
+    if (!('hyphenate' in baseOptions)) {
+        baseOptions.hyphenate = true;
+    }
     if (baseUrl.endsWith('/')) {
         baseUrl = baseUrl.substr(0, baseUrl.length - 1);
     }
-    return getProxy([baseUrl], baseOptions);
+    return getProxy([baseUrl], adapter, baseOptions);
 }
 
 module.exports = xyquest;
