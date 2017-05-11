@@ -29,6 +29,12 @@ test('Edge cases', async t => {
     t.is(result.body, undefined);
 });
 
+test('Use with query params', async t => {
+    const x = xyquest(testAdapter, 'http://foo.bar');
+    const { uri } = await x.meow.spamBuzz.rawr.get({ name: 'lolz rawr' });
+    t.is(uri, 'http://foo.bar/meow/spam-buzz/rawr?name=lolz%20rawr');
+});
+
 test('Request adapter', async t => {
     const options = {
         response: {
